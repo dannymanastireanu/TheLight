@@ -94,8 +94,8 @@ public:
 			std::cout << "Error link program: " << infoLog << std::endl;
 		}
 
-	/*	glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);*/
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
 	}
 
 	void use() {

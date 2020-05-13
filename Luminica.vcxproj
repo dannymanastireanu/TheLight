@@ -29,6 +29,10 @@
     <None Include="res\shaders\fragment.glsl" />
     <None Include="res\shaders\vertex.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\texture\brickwall.jpg" />
+    <Image Include="res\texture\brickwall_normal.jpg" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{5FD93A7F-7609-4FD9-BACB-F7E20509CFEA}</ProjectGuid>
