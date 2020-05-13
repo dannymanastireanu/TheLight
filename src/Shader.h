@@ -107,14 +107,10 @@ public:
 	}
 
 	void set1i(GLint value, const GLchar *uniformName) {
-		use();
-
 		glUniform1i(glGetUniformLocation(this->mainProgram, uniformName), value);
-
-		disable();
 	}
 
-	void setVec1f(GLfloat value, const GLchar *uniformName) {
+	void setVec1f(GLint value, const GLchar *uniformName) {
 		use();
 
 		glUniform1i(glGetUniformLocation(this->mainProgram, uniformName), value);
@@ -146,19 +142,10 @@ public:
 		disable();
 	}
 
-	void setMat4fv(glm::mat3 value, const GLchar *uniformName, GLboolean doTranspose = GL_FALSE) {
-		use();
-
-		glUniformMatrix3fv(glGetUniformLocation(this->mainProgram, uniformName), 1, doTranspose, glm::value_ptr(value));
-
-		disable();
-	}
-
 	void setMat4fv(glm::mat4 value, const GLchar *uniformName, GLboolean doTranspose = GL_FALSE) {
-		use();
+
 
 		glUniformMatrix4fv(glGetUniformLocation(this->mainProgram, uniformName), 1, doTranspose, glm::value_ptr(value));
 
-		disable();
 	}
 };

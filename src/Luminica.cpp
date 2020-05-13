@@ -5,13 +5,13 @@ const char* vfile = "D:\\A.C\\SPG\\Project\\TheLight\\res\\shaders\\vertex.glsl"
 const char* ffile = "D:\\A.C\\SPG\\Project\\TheLight\\res\\shaders\\fragment.glsl";
 
 
-void updateInput(GLFWwindow *window) {
+
+void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale) {
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-}
 
-void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale) {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		position.z += 0.03f;
 	}
@@ -179,6 +179,8 @@ entry_point{
 
 	//view position
 
+	glm::vec3 lightPosition(0.0f, 0.0f, 0.2f);
+	glm::vec3 viewPosition(glm::vec3(0, 0, 1));
 
 
 	glm::mat4 modelMatrix(1.0f);
@@ -190,13 +192,13 @@ entry_point{
 
 
 	glm::mat4 viewMatrix = glm::lookAt(
-		glm::vec3(0.0f, 0.0f, 1.0f), // Camera is at (x, x, x), in World Space
+		viewPosition, // Camera is at (x, x, x), in World Space
 		glm::vec3(0, 0, 0), // and looks at the origin
 		glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 
 	
-	float FoV = 45.0f;
+	float FoV = 55.0f;
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	glm::mat4 projectionMatrix = glm::perspective(
 		glm::radians(FoV),									// The vertical Field of View, in radians: the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
@@ -207,15 +209,14 @@ entry_point{
 
 	glm::mat4 MVPmatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-	glm::vec3 lightPosition(0.0f, 0.0f, 0.2f);
-	glm::vec3 viewPosition(glm::vec3(0, 0, 1));
 
 	mainShader.use();
 
-	glUniformMatrix4fv(glGetUniformLocation(mainShader.getMainProgram(), "modelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-	glUniformMatrix4fv(glGetUniformLocation(mainShader.getMainProgram(), "MVP"), 1, GL_FALSE, glm::value_ptr(MVPmatrix));
-	glUniform3fv(glGetUniformLocation(mainShader.getMainProgram(), "lightPosition"), 1, glm::value_ptr(lightPosition));
-	glUniform3fv(glGetUniformLocation(mainShader.getMainProgram(), "viewPosition"), 1, glm::value_ptr(viewPosition));
+	mainShader.setMat4fv(modelMatrix, "modelMatrix");
+	mainShader.setMat4fv(MVPmatrix, "MVP");
+	mainShader.setVec3f(lightPosition, "lightPosition");
+	mainShader.setVec3f(viewPosition, "viewPosition");
+
 
 	mainShader.disable();
 
@@ -224,7 +225,6 @@ entry_point{
 		glfwPollEvents();
 		updateInput(window, position, rotation, scale);
 
-		updateInput(window);
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -233,7 +233,9 @@ entry_point{
 
 
 		//Update uniform
-		glUniform1i(glGetUniformLocation(mainShader.getMainProgram(), "wallTexture"), 0);
+		// Varianta din clasa nu inlocuieste/functioneaza
+		mainShader.set1i(0, "wallTexture");
+		
 		
 		modelMatrix = glm::mat4(1.0f);
 
@@ -245,8 +247,8 @@ entry_point{
 	
 		glm::mat4 MVPmatrix = projectionMatrix * viewMatrix * modelMatrix;
 		//glm::mat4 MVPmatrix = projectionMatrix * modelMatrix;
-		
-		glUniformMatrix4fv(glGetUniformLocation(mainShader.getMainProgram(), "MVP"), 1, GL_FALSE, glm::value_ptr(MVPmatrix));
+
+		mainShader.setMat4fv(MVPmatrix, "MVP");
 
 
 		glActiveTexture(GL_TEXTURE0);

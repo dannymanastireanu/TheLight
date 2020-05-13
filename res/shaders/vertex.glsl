@@ -19,7 +19,10 @@ void main() {
 	vsPosition = vec4(modelMatrix * vec4(position, 1.0f)).xyz;
 	vsColor = color;
 	vsTexcoord = vec2(texcoord.x, texcoord.y);
-	vsNormal = mat3(modelMatrix) * normal;
+
+	// De ce model matrix ul imi strica iluminarea?
+//	vsNormal = mat3(modelMatrix) * normal;	
+	vsNormal = mat3(transpose(inverse(MVP))) * normal;
 	
 	gl_Position = MVP * vec4(position, 1.0f);
 }
