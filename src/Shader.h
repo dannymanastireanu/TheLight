@@ -14,8 +14,6 @@
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 
 class Shader {

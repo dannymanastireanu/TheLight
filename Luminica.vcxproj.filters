@@ -3,16 +3,9 @@
   <ItemGroup>
     <ClInclude Include="src\EntryPoint.hpp" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Luminica.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\shaders\fragment.glsl" />
-    <None Include="res\shaders\vertex.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\texture\brickwall.jpg" />
-    <Image Include="res\texture\brickwall_normal.jpg" />
   </ItemGroup>
 </Project>

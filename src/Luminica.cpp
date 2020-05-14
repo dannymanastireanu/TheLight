@@ -1,8 +1,9 @@
 #include "Shader.h"
+#include "Texture.h"
 #include "EntryPoint.hpp"
-//I will change this bullshit later.
-const char* vfile = "D:\\A.C\\SPG\\Project\\TheLight\\res\\shaders\\vertex.glsl";
-const char* ffile = "D:\\A.C\\SPG\\Project\\TheLight\\res\\shaders\\fragment.glsl";
+
+const char* vfile = "res\\shaders\\vertex.glsl";
+const char* ffile = "res\\shaders\\fragment.glsl";
 
 
 
@@ -96,16 +97,16 @@ entry_point{
 		return -1;
 	}
 
-	//Some difficult stuff
+	//Some difficult stuff who doens't work
 	/*glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+	glFrontFace(GL_CCW);*/
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);*/
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	Shader mainShader(vfile, ffile);
 	mainShader.use();
@@ -148,29 +149,7 @@ entry_point{
 	
 	glBindVertexArray(0);
 
-	//Do some stuff with texture
-	int imageHeight, nrChannels, imageWidth;
-	unsigned char* image = stbi_load("D:\\A.C\\SPG\\Project\\TheLight\\res\\texture\\brickwall.jpg", &imageWidth, &imageHeight, &nrChannels, 0);
-
-	GLuint wallTexture = 0;
-	glGenTextures(1, &wallTexture);
-	glBindTexture(GL_TEXTURE_2D, wallTexture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	if (image) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	} else {
-		std::cout << "Error load texture with stbi_load." << std::endl;
-	}
-
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	stbi_image_free(image);
+	Texture wallTexture("res\\texture\\brickwall.jpg", GL_TEXTURE_2D, 0);
 
 	// INIT MATRICES
 	glm::vec3 position(0.0f);
@@ -234,7 +213,8 @@ entry_point{
 
 		//Update uniform
 		// Varianta din clasa nu inlocuieste/functioneaza
-		mainShader.set1i(0, "wallTexture");
+		//mainShader.set1i(wallTexture.getId(), "wallTexture");
+		mainShader.set1i(wallTexture.getUnit(), "wallTexture");
 		
 		
 		modelMatrix = glm::mat4(1.0f);
@@ -251,8 +231,7 @@ entry_point{
 		mainShader.setMat4fv(MVPmatrix, "MVP");
 
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, wallTexture);
+		wallTexture.bind(0, GL_TEXTURE_2D);
 
 		glBindVertexArray(VAO);
 
