@@ -1,6 +1,7 @@
-#include "Material.h"
-#include "Texture.h"
 #include "Vertex.h"
+#include "Texture.h"
+#include "Material.h"
+#include "Mesh.h"
 #include "EntryPoint.hpp"
 
 const char* vfile = "res\\shaders\\vertex.glsl";
@@ -109,8 +110,11 @@ entry_point{
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	// Shader init
 	Shader mainShader(vfile, ffile);
-	mainShader.use();
+	
+	// Model mesh init
+	Mesh test(vertices, noVertices, indices, noIndices);
 
 
 	// get version info
@@ -195,6 +199,8 @@ entry_point{
 	mainShader.use();
 
 	mainShader.setMat4fv(modelMatrix, "modelMatrix");
+	mainShader.setMat4fv(viewMatrix, "viewMatrix");
+	mainShader.setMat4fv(projectionMatrix, "projectionMatrix");
 	mainShader.setMat4fv(MVPmatrix, "MVP");
 	mainShader.setVec3f(lightPosition, "lightPosition");
 	mainShader.setVec3f(viewPosition, "viewPosition");
@@ -230,15 +236,17 @@ entry_point{
 		glm::mat4 MVPmatrix = projectionMatrix * viewMatrix * modelMatrix;
 		//glm::mat4 MVPmatrix = projectionMatrix * modelMatrix;
 
-		mainShader.setMat4fv(MVPmatrix, "MVP");
+		mainShader.setMat4fv(modelMatrix, "modelMatrix");
 
 
 		wallTexture.bind();
 
 		glBindVertexArray(VAO);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glDrawElements(GL_TRIANGLES, noIndices, GL_UNSIGNED_INT, 0);
+
+		test.render(&mainShader);
+		
 
 		glfwSwapBuffers(window);
 		glFlush();

@@ -12,7 +12,8 @@ out vec2 vsTexcoord;
 out vec3 vsNormal;
 
 uniform mat4 MVP;
-uniform mat4 modelMatrix;
+uniform mat4 modelMatrix, viewMatrix, projectionMatrix;
+
 
 void main() {
 
@@ -24,5 +25,6 @@ void main() {
 //	vsNormal = mat3(modelMatrix) * normal;	
 	vsNormal = mat3(transpose(inverse(MVP))) * normal;
 	
-	gl_Position = MVP * vec4(position, 1.0f);
+//	gl_Position = MVP * vec4(position, 1.0f);
+	gl_Position = (projectionMatrix * viewMatrix * modelMatrix) * vec4(position, 1.0f);
 }
