@@ -1,5 +1,6 @@
-#include "Shader.h"
+#include "Material.h"
 #include "Texture.h"
+#include "Vertex.h"
 #include "EntryPoint.hpp"
 
 const char* vfile = "res\\shaders\\vertex.glsl";
@@ -53,9 +54,9 @@ void error_callback(int error, const char* description) {
 
 
 Vertex vertices[] = {
-	glm::vec3(0.0f, 0.5f, -1.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(-0.5f, -0.5f, -1.0f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(0.5f, -0.5f, -1.0f),		glm::vec3(0.0f, 0.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f)
+	glm::vec3(0.0f, 0.5f, 0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(-0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 0.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f)
 };
 
 unsigned int noVertices = sizeof(vertices) / sizeof(Vertex);
@@ -150,6 +151,8 @@ entry_point{
 	glBindVertexArray(0);
 
 	Texture wallTexture("res\\texture\\brickwall.jpg", GL_TEXTURE_2D, 0);
+	Texture wallTextureNormal("res\\texture\\brickwall_normal.jpg", GL_TEXTURE_2D, 1);
+	Material materialWall(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), wallTexture.getUnit(), wallTextureNormal.getUnit());
 
 	// INIT MATRICES
 	glm::vec3 position(0.0f);
@@ -212,9 +215,8 @@ entry_point{
 
 
 		//Update uniform
-		// Varianta din clasa nu inlocuieste/functioneaza
-		//mainShader.set1i(wallTexture.getId(), "wallTexture");
-		mainShader.set1i(wallTexture.getUnit(), "wallTexture");
+
+		materialWall.sendToShader(mainShader);
 		
 		
 		modelMatrix = glm::mat4(1.0f);
@@ -231,7 +233,7 @@ entry_point{
 		mainShader.setMat4fv(MVPmatrix, "MVP");
 
 
-		wallTexture.bind(0, GL_TEXTURE_2D);
+		wallTexture.bind();
 
 		glBindVertexArray(VAO);
 

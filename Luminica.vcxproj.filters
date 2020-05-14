@@ -4,6 +4,8 @@
     <ClInclude Include="src\EntryPoint.hpp" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\Vertex.h" />
+    <ClInclude Include="src\Material.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Luminica.cpp" />

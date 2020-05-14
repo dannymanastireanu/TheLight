@@ -1,5 +1,12 @@
 #version 440 core
 
+struct Material {
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	sampler2D diffuseTex;
+	sampler2D specularTex;
+};
 
 in vec3 vsPosition;
 in vec3 vsColor;
@@ -8,7 +15,7 @@ in vec3 vsNormal;
 
 out vec4 fragColor;
 
-uniform sampler2D wallTexture;
+uniform Material material;
 
 uniform vec3 lightPosition;
 uniform vec3 viewPosition;
@@ -35,30 +42,12 @@ vec3 lighting(vec3 pos, vec3 normal, vec3 lightPos, vec3 viewPos,
 
 void main() {
 
-	//Some problem with vsColor
-	//fragColor = vec4(vec3(1.0f, 1.0f, 0.0f), 1.0f);
-
-	//Ambient light
-//	vec3 ambientLight = vec3(0.1f, 0.1f, 0.1f);
-//
-//	//Diffuse light
-//	vec3 posToLightDirection = normalize(vsPosition - lightPosition);
-//	vec3 diffuseColor = vec3(1.0f, 1.0f, 1.0f);
-//	float diffuse = clamp(dot(vsNormal, posToLightDirection), 0, 1);		//Vreau ca diffuse sa fie intre 0-1
-//	vec3 diffuseFinal = diffuse * diffuseColor;		// Cat de multa lumina va cadea pe portiunea din obiect
-
-	//Specular light
-
-//
-//	fragColor = texture(wallTexture, vsTexcoord) * vec4(vsColor, 1.0f) * 
-//				(vec4(ambientLight, 1.0f) + vec4(diffuseFinal, 1.0f));
-
-	vec3 ambient = vec3(0.2);
-	vec3 diffuse = vec3(0.5, 0.5, 0.5);
-	vec3 specular = vec3(0.95);
+	vec3 ambient = material.ambient;
+	vec3 diffuse = material.diffuse;
+	vec3 specular = material.specular;
 	float specPower = 32;
 	
-	vec3 colorFromTexture = texture2D(wallTexture, vsTexcoord).rgb;
+	vec3 colorFromTexture = texture2D(material.diffuseTex, vsTexcoord).rgb;
 
 	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
 				

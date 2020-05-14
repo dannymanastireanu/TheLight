@@ -47,9 +47,9 @@ public:
 
 	inline GLuint getId() const { return texture;}
 
-	void bind(GLint textureNext, GLenum type) {
-		glActiveTexture(GL_TEXTURE0 + textureNext);
-		glBindTexture(type, texture);
+	void bind() {
+		glActiveTexture(GL_TEXTURE0 + this->textureUnit);
+		glBindTexture(this->type, this->texture);
 	}
 
 	void unbind(GLenum type) {

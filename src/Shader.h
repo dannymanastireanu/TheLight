@@ -125,11 +125,7 @@ public:
 	}
 
 	void setVec3f(glm::fvec3 value, const GLchar *uniformName) {
-		use();
-
 		glUniform3fv(glGetUniformLocation(this->mainProgram, uniformName), 1, glm::value_ptr(value));
-
-		disable();
 	}
 
 	void setVec4f(glm::fvec4 value, const GLchar *uniformName) {
