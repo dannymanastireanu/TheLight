@@ -13,7 +13,7 @@ in vec3 vsColor;
 in vec2 vsTexcoord;
 in vec3 vsNormal;
 
-out vec4 fragColor;
+out vec4 FragColor;
 
 uniform Material material;
 
@@ -36,7 +36,7 @@ vec3 lighting(vec3 pos, vec3 normal, vec3 lightPos, vec3 viewPos,
 	vec3 diffuseColor = diffCoef * lightColor;
 	vec3 specularColor = specCoef * specular * lightColor;
 	vec3 col = ( ambientColor + diffuseColor + specularColor ); 
-
+	
 	return clamp(col, 0, 1);
 }
 
@@ -50,6 +50,6 @@ void main() {
 	vec3 colorFromTexture = texture2D(material.diffuseTex, vsTexcoord).rgb;
 
 	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
-				
-	fragColor = vec4(color, 1.0);
+	
+	FragColor = vec4(color, 1.0);
 }

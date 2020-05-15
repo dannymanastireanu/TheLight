@@ -7,6 +7,7 @@
     <ClInclude Include="src\Vertex.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Primitives.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Luminica.cpp" />

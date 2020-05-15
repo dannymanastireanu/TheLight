@@ -1,4 +1,5 @@
-#include "Vertex.h"
+ï»¿#include "Vertex.h"
+#include "Primitives.h"
 #include "Texture.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -9,42 +10,42 @@ const char* ffile = "res\\shaders\\fragment.glsl";
 
 
 
-void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale) {
+void updateInput(GLFWwindow* window, Mesh& mesh) {
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		position.z += 0.03f;
+		mesh.move(glm::vec3(0.0f, 0.0f, +0.02f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		position.z -= 0.03f;
+		mesh.move(glm::vec3(0.0f, 0.0f, -0.02f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		position.x += 0.03f;
+		mesh.move(glm::vec3(0.02f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		position.x -= 0.03f;
+		mesh.move(glm::vec3(-0.02f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-		rotation.z -= 1.0f;
+		mesh.rotate(glm::vec3(0.0f, 2.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
-		rotation.z += 1.0f;
+		mesh.rotate(glm::vec3(0.0f, -2.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-		rotation.x -= 3.0f;
+		mesh.rotate(glm::vec3(-2.0f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-		rotation.x += 3.0f;
+		mesh.rotate(glm::vec3(2.0f, 0.0f,0.0f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
-		rotation.y -= 2.0f;
+
 	}
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
-		rotation.y += 2.0f;
+
 	}
 }
 
@@ -67,6 +68,9 @@ GLuint indices[] = {
 };
 
 unsigned int noIndices = sizeof(indices) / sizeof(GLuint);
+
+
+Triangle test;
 
 entry_point{
 
@@ -112,9 +116,9 @@ entry_point{
 
 	// Shader init
 	Shader mainShader(vfile, ffile);
-	
+
 	// Model mesh init
-	Mesh test(vertices, noVertices, indices, noIndices);
+	Mesh mesh(test.getVertices(), test.getNoVertices(), test.getIndices(), test.getNoIndices());
 
 
 	// get version info
@@ -123,58 +127,15 @@ entry_point{
 	printf("Renderer: %s\n", renderer);
 	printf("OpenGL version supported %s\n", version);
 
-	//VAO, VBO, EBO
-	GLuint VAO = -1;
-	glCreateVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	GLuint VBO = -1;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	GLuint EBO = -1;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
-	glEnableVertexAttribArray(2);
-	//Normal
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(3);
-
-	
-	glBindVertexArray(0);
-
 	Texture wallTexture("res\\texture\\brickwall.jpg", GL_TEXTURE_2D, 0);
 	Texture wallTextureNormal("res\\texture\\brickwall_normal.jpg", GL_TEXTURE_2D, 1);
 	Material materialWall(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), wallTexture.getUnit(), wallTextureNormal.getUnit());
 
-	// INIT MATRICES
-	glm::vec3 position(0.0f);
-	glm::vec3 rotation(0.0f);
-	glm::vec3 scale(1.0f);
 
 	//view position
-
 	glm::vec3 lightPosition(0.0f, 0.0f, 0.2f);
 	glm::vec3 viewPosition(glm::vec3(0, 0, 1));
 
-
-	glm::mat4 modelMatrix(1.0f);
-	modelMatrix = glm::translate(modelMatrix, position);
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	modelMatrix = glm::scale(modelMatrix, scale);
 
 
 	glm::mat4 viewMatrix = glm::lookAt(
@@ -183,25 +144,21 @@ entry_point{
 		glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 
-	
+
 	float FoV = 55.0f;
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	glm::mat4 projectionMatrix = glm::perspective(
-		glm::radians(FoV),									// The vertical Field of View, in radians: the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
+		glm::radians(FoV),									// The vertical Field of View, in radians: the amount of "zoom". Think "camera lens". Usually between 90Â° (extra wide) and 30Â° (quite zoomed in)
 		(float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,			// Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
 		0.1f,												// Near clipping plane. Keep as big as possible, or you'll get precision issues.
 		100.0f												// Far clipping plane. Keep as little as possible.
 	);
 
-	glm::mat4 MVPmatrix = projectionMatrix * viewMatrix * modelMatrix;
-
 
 	mainShader.use();
 
-	mainShader.setMat4fv(modelMatrix, "modelMatrix");
 	mainShader.setMat4fv(viewMatrix, "viewMatrix");
 	mainShader.setMat4fv(projectionMatrix, "projectionMatrix");
-	mainShader.setMat4fv(MVPmatrix, "MVP");
 	mainShader.setVec3f(lightPosition, "lightPosition");
 	mainShader.setVec3f(viewPosition, "viewPosition");
 
@@ -211,42 +168,21 @@ entry_point{
 	while (!glfwWindowShouldClose(window)) {
 
 		glfwPollEvents();
-		updateInput(window, position, rotation, scale);
+		updateInput(window, mesh);
 
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+
 		mainShader.use();
-
-
-		//Update uniform
-
 		materialWall.sendToShader(mainShader);
-		
-		
-		modelMatrix = glm::mat4(1.0f);
-
-		modelMatrix = glm::translate(modelMatrix, position);
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		modelMatrix = glm::scale(modelMatrix, scale);
-	
-		glm::mat4 MVPmatrix = projectionMatrix * viewMatrix * modelMatrix;
-		//glm::mat4 MVPmatrix = projectionMatrix * modelMatrix;
-
-		mainShader.setMat4fv(modelMatrix, "modelMatrix");
 
 
 		wallTexture.bind();
 
-		glBindVertexArray(VAO);
+		mesh.render(&mainShader);
 
-		glDrawElements(GL_TRIANGLES, noIndices, GL_UNSIGNED_INT, 0);
-
-		test.render(&mainShader);
-		
 
 		glfwSwapBuffers(window);
 		glFlush();
@@ -260,8 +196,6 @@ entry_point{
 	//End of program
 	glfwDestroyWindow(window);
 	glfwTerminate();
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
 	glDeleteProgram(mainShader.getMainProgram());
 	mainShader.~Shader();
 

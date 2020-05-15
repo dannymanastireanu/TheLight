@@ -38,7 +38,7 @@ public:
 		shader.setVec3f(this->ambient, "material.ambient");
 		shader.setVec3f(this->diffuse, "material.diffuse");
 		shader.setVec3f(this->specular, "material.specular");
-		shader.set1i(this->diffuseTex, "diffuseTex");
-		shader.set1i(this->specularTex, "specularTex");
+		shader.set1i(this->diffuseTex, "material.diffuseTex");
+		shader.set1i(this->specularTex, "material.specularTex");
 	}
 };

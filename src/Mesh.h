@@ -9,45 +9,39 @@
 
 class Mesh {
 private:
-	std::vector<Vertex> vertices;
-	std::vector<GLuint> indices;
+	unsigned noVertices;
+	unsigned noIndices;
 
 	GLuint VAO, VBO, EBO;
 	glm::vec3 rotation, scale, position;
 	glm::mat4 modelMatrix;
 
-	void init(Vertex* vertexArray, const unsigned& noVertices, GLuint* indexArray, const unsigned& noIndices) {
-		for (size_t i = 0; i < noVertices; i++)
-		{
-			this->vertices.push_back(vertexArray[i]);
-		}
+	
+	void setupMesh(Vertex* vertices, const unsigned& noVertices, GLuint* indices, const unsigned& noIndices) {
 
-		for (size_t i = 0; i < noIndices; i++)
-		{
-			this->indices.push_back(indexArray[i]);
-		}
-	}
+		this->noVertices = noVertices;
+		this->noIndices = noIndices;
 
-	void initVAO() {
+		// Create VAO
 		glCreateVertexArrays(1, &VAO);
 		glBindVertexArray(VAO);
 		
 		glGenBuffers(1, &VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		// Trimitem data in bytes catre gpu
-		glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, this->noVertices * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &EBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->noIndices * sizeof(GLuint), indices, GL_STATIC_DRAW);
 
-
+		//Position
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
 		glEnableVertexAttribArray(0);
-
+		//Color
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
 		glEnableVertexAttribArray(1);
-
+		//Texture coord
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
 		glEnableVertexAttribArray(2);
 		//Normal
@@ -58,12 +52,11 @@ private:
 		glBindVertexArray(0);
 	}
 
-	void initModelMatrix() {
+	void updateUniforms(Shader* shader) {
+		shader->setMat4fv(modelMatrix, "modelMatrix");
+	}
 
-		this->position = glm::vec3(0.0f);
-		this->rotation = glm::vec3(0.0f);
-		this->scale	   = glm::vec3(1.0f);
-
+	void updateModelMatrix() {
 		this->modelMatrix = glm::mat4(1.0f);
 		this->modelMatrix = glm::translate(modelMatrix, position);
 		this->modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -72,30 +65,60 @@ private:
 		this->modelMatrix = glm::scale(modelMatrix, scale);
 	}
 
-	void updateUniforms(Shader* shader) {
-		shader->setMat4fv(modelMatrix, "modelMatrix");
-	}
-
 public:
 
-	Mesh(Vertex* vertexArray, const unsigned& noVertices, GLuint* indexArray, const unsigned& noIndices) {
-		this->init(vertexArray, noVertices, indexArray, noIndices);
-		this->initVAO();
-		this->initModelMatrix();
+	Mesh(Vertex* vertexArray, const unsigned& noVertices, GLuint* indexArray, const unsigned& noIndices,
+		glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f)) {
+
+		this->position = position;
+		this->rotation = rotation;
+		this->scale = scale;
+
+		this->setupMesh(vertexArray, noVertices, indexArray, noIndices);
+		this->updateModelMatrix();
 	}
 
 	void update();
 	void render(Shader* shaderProgram) {
 
+		this->updateModelMatrix();
 		this->updateUniforms(shaderProgram);
 		
 		shaderProgram->use();
 
 		glBindVertexArray(VAO);
 		// Render
-		glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, noIndices, GL_UNSIGNED_INT, 0);
 
 	}
+
+	void setPosition(const glm::vec3 position) {
+		this->position = position;
+	}
+
+	void setRotation(const glm::vec3 rotation) {
+		this->rotation = rotation;
+	}
+
+	void setScale(const glm::vec3 scale) {
+		this->scale = scale;
+	}
+
+	// Action
+
+	void move(const glm::vec3 position) {
+		this->position += position;
+	}
+
+	void rotate(const glm::vec3 rotation) {
+		this->rotation += rotation;
+	}
+
+	void scaleUp(const glm::vec3 scale) {
+		this->scale += scale;
+	}
+
+
 
 	~Mesh() {
 		glDeleteVertexArrays(1, &this->VAO);
