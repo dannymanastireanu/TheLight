@@ -8,6 +8,9 @@
 const char* vfile = "res\\shaders\\vertex.glsl";
 const char* ffile = "res\\shaders\\fragment.glsl";
 
+const int WINDOW_WIDTH = 1280;
+const int WINDOW_HEIGHT = 720;
+int framebufferWidth, framebufferHeight;
 
 
 void updateInput(GLFWwindow* window, Mesh& mesh) {
@@ -54,29 +57,23 @@ void error_callback(int error, const char* description) {
 }
 
 
+GLFWwindow* createWindow(const char* winName, const int width, const int height, int& frameBufferWidht, int& frameBufferHeight, const int glMin, const int glMaj) {
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glMaj);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMin);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-Vertex vertices[] = {
-	glm::vec3(0.0f, 0.5f, 0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(-0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
-	glm::vec3(0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 0.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f)
-};
+	GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, winName, NULL, NULL);
+	glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
+	glViewport(0, 0, framebufferWidth, framebufferHeight);
 
-unsigned int noVertices = sizeof(vertices) / sizeof(Vertex);
+	glfwMakeContextCurrent(window);
 
-GLuint indices[] = {
-	0, 1, 2
-};
-
-unsigned int noIndices = sizeof(indices) / sizeof(GLuint);
-
-
-Triangle test;
+	return window;
+}
 
 entry_point{
 
-	const int WINDOW_WIDTH = 1280;
-	const int WINDOW_HEIGHT = 720;
-	int framebufferWidth, framebufferHeight;
 
 	glfwSetErrorCallback(error_callback);
 
@@ -84,26 +81,16 @@ entry_point{
 		return -1;
 	}
 
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenRender", NULL, NULL);
-	glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
-	glViewport(0, 0, framebufferWidth, framebufferHeight);
-
-	glfwMakeContextCurrent(window);
+	GLFWwindow* window = createWindow("TheLight", WINDOW_WIDTH, WINDOW_HEIGHT, framebufferWidth, framebufferHeight, 4, 4);
 
 	GLint err;
 	if ((err = glewInit()) != GLEW_OK) {
-		/* Problem: glewInit failed, something is seriously wrong. */
 		std::cerr << glewGetErrorString(err);
 		glfwTerminate();
 		return -1;
 	}
 
-	//Some difficult stuff who doens't work
+	//Some stuff who doens't work momentary
 	/*glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -112,13 +99,15 @@ entry_point{
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// IDK
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Shader init
 	Shader mainShader(vfile, ffile);
 
 	// Model mesh init
-	Mesh mesh(test.getVertices(), test.getNoVertices(), test.getIndices(), test.getNoIndices());
+	Triangle triang = Triangle();
+	Mesh mesh(&triang);
 
 
 	// get version info

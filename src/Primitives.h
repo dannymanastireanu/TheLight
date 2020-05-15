@@ -6,7 +6,7 @@
 
 #include "Vertex.h"
 
-class Primitives {
+class Primitive {
 private:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned> indices;
@@ -14,7 +14,7 @@ private:
 
 public:
 
-	Primitives() {
+	Primitive() {
 
 	}
 
@@ -39,14 +39,14 @@ public:
 	const size_t getNoVertices() { return this->vertices.size(); }
 	const size_t getNoIndices() { return this->indices.size(); }
 
-	~Primitives() {
+	virtual ~Primitive() {
 
 	}
 };
 
-class Triangle : public Primitives {
+class Triangle : public Primitive {
 public:
-	Triangle(): Primitives() {
+	Triangle(): Primitive() {
 		Vertex vertices[] = {
 			glm::vec3(0.0f, 0.5f, 0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(-0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f),

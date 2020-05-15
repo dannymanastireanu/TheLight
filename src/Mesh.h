@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Vertex.h"
+#include "Primitives.h"
 #include "Texture.h"
 #include "Material.h"
 
@@ -16,7 +17,41 @@ private:
 	glm::vec3 rotation, scale, position;
 	glm::mat4 modelMatrix;
 
-	
+	void setupMesh(Primitive* primitives) {
+
+		this->noVertices = primitives->getNoVertices();
+		this->noIndices = primitives->getNoIndices();
+
+		// Create VAO
+		glCreateVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		// Trimitem data in bytes catre gpu
+		glBufferData(GL_ARRAY_BUFFER, this->noVertices * sizeof(Vertex), primitives->getVertices(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->noIndices * sizeof(GLuint), primitives->getIndices(), GL_STATIC_DRAW);
+
+		//Position
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+		glEnableVertexAttribArray(0);
+		//Color
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+		glEnableVertexAttribArray(1);
+		//Texture coord
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
+		glEnableVertexAttribArray(2);
+		//Normal
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+		glEnableVertexAttribArray(3);
+
+
+		glBindVertexArray(0);
+	}
+
 	void setupMesh(Vertex* vertices, const unsigned& noVertices, GLuint* indices, const unsigned& noIndices) {
 
 		this->noVertices = noVertices;
@@ -66,6 +101,17 @@ private:
 	}
 
 public:
+
+	Mesh(Primitive* primitive,
+		glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f)) {
+
+		this->position = position;
+		this->rotation = rotation;
+		this->scale = scale;
+
+		this->setupMesh(primitive);
+		this->updateModelMatrix();
+	}
 
 	Mesh(Vertex* vertexArray, const unsigned& noVertices, GLuint* indexArray, const unsigned& noIndices,
 		glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f)) {
