@@ -8,8 +8,10 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Primitives.h" />
+    <ClInclude Include="ClassRoom.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Luminica.cpp" />
+    <ClCompile Include="ClassRoom.cpp" />
   </ItemGroup>
 </Project>

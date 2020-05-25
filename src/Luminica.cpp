@@ -91,8 +91,8 @@ entry_point{
 	}
 
 	//Some stuff who doens't work momentary
-	/*glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	/*glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);*/
 
@@ -161,7 +161,7 @@ entry_point{
 
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 		mainShader.use();
@@ -169,9 +169,9 @@ entry_point{
 
 
 		wallTexture.bind();
+		wallTextureNormal.bind();
 
 		mesh.render(&mainShader);
-
 
 		glfwSwapBuffers(window);
 		glFlush();

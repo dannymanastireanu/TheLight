@@ -20,6 +20,7 @@ public:
 		this->textureUnit = textureUnit;
 		this->type = type;
 
+		//stbi_set_flip_vertically_on_load(false);
 		unsigned char* image = stbi_load(fn, &width, &height, NULL, 0);
 
 		glGenTextures(1, &texture);

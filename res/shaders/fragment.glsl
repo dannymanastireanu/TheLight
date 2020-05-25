@@ -13,10 +13,13 @@ in vec3 vsColor;
 in vec2 vsTexcoord;
 in vec3 vsNormal;
 
+in mat4 vsModelMatrix;
+
 out vec4 FragColor;
 
 uniform Material material;
 
+uniform sampler2D normalMap; 
 uniform vec3 lightPosition;
 uniform vec3 viewPosition;
 
@@ -48,8 +51,20 @@ void main() {
 	float specPower = 32;
 	
 	vec3 colorFromTexture = texture2D(material.diffuseTex, vsTexcoord).rgb;
+	
+	vec3 normalFromMap = texture(material.specularTex, vsTexcoord).rgb;
+	normalFromMap.g = 1 - normalFromMap.g;
+	normalFromMap = normalFromMap * 2 - 1;
 
-	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
+	// Pentru a modifica normala in functie de transformarile geometrice pe care le aplic
+	normalFromMap = mat3(transpose(inverse(vsModelMatrix))) * normalFromMap;
+	
+
+	//	Without normal map
+//	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
+	
+	//	With normal map
+	vec3 color = lighting(vsPosition, normalFromMap, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
 	
 	FragColor = vec4(color, 1.0);
 }

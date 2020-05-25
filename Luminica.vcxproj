@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClassRoom.h" />
     <ClInclude Include="src\EntryPoint.hpp" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
@@ -28,6 +29,7 @@
     <ClInclude Include="src\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClassRoom.cpp" />
     <ClCompile Include="src\Luminica.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

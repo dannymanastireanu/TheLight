@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <windows.h>
 
 #define GLEW_STATIC
 #include <GL/glew.h>

@@ -14,6 +14,7 @@ out vec3 vsNormal;
 uniform mat4 MVP;
 uniform mat4 modelMatrix, viewMatrix, projectionMatrix;
 
+out mat4 vsModelMatrix;
 
 void main() {
 
@@ -23,6 +24,8 @@ void main() {
 
 	// De ce transpuse and inverse?
 	vsNormal = mat3(transpose(inverse(modelMatrix))) * normal;
+	
+	vsModelMatrix = modelMatrix;
 	
 	gl_Position = (projectionMatrix * viewMatrix * modelMatrix) * vec4(position, 1.0f);
 }
