@@ -47,6 +47,12 @@ private:
 		//Normal
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
 		glEnableVertexAttribArray(3);
+		//Tangenta
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, tangent));
+		glEnableVertexAttribArray(4);
+		//Bitangenta
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, bitangen));
+		glEnableVertexAttribArray(5);
 
 
 		glBindVertexArray(0);
@@ -82,6 +88,12 @@ private:
 		//Normal
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
 		glEnableVertexAttribArray(3);
+		//Tangenta
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, tangent));
+		glEnableVertexAttribArray(4);
+		//Bitangenta
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, bitangen));
+		glEnableVertexAttribArray(5);
 
 
 		glBindVertexArray(0);

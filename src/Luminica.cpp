@@ -106,7 +106,7 @@ entry_point{
 	Shader mainShader(vfile, ffile);
 
 	// Model mesh init
-	Triangle triang = Triangle();
+	Pyramid triang = Pyramid();
 	Mesh mesh(&triang);
 
 

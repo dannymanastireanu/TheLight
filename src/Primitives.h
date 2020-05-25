@@ -34,16 +34,16 @@ public:
 	void init(const Vertex* vertices, const unsigned noVertices, const GLuint* indices, const unsigned noIndices) {
 
 		// Aceasta linie pune manual vertices
-	/*	for (size_t i = 0; i < noVertices; i++) {
+		for (size_t i = 0; i < noVertices; i++) {
 			this->vertices.push_back(vertices[i]);
 		}
 
 		for (size_t i = 0; i < noIndices; i++) {
 			this->indices.push_back(indices[i]);
-		}*/
+		}
 
 		// Incarc din fisier vertices
-		this->loadDataFromObj("res\\shaders\\myPyramid.obj");
+		//this->loadDataFromObj("res\\shaders\\myPyramid.obj");
 	}
 
 	inline Vertex* getVertices() {
@@ -114,8 +114,35 @@ public:
 						indici.push_back(vertexIdx);
 					}
 
+					glm::vec3 tangent, bitangent;
 					for (size_t i = 0; i < VERTICES_PER_FACE; i++) {
 						
+						// BEGIN Compute tan && bitan
+
+						
+						// Compute single time for a triangle(same for each vertex)
+						if (i == 0) {
+							glm::vec3 edge1 = vertexPosition[indici[1][0] - 1] - vertexPosition[indici[0][0] - 1];
+							glm::vec3 edge2 = vertexPosition[indici[2][0] - 1] - vertexPosition[indici[1][0] - 1];
+
+							glm::vec2 deltaUV1 = vertexTexture[indici[1][1] - 1] - vertexTexture[indici[0][1] - 1];
+							glm::vec2 deltaUV2 = vertexTexture[indici[2][1] - 1] - vertexTexture[indici[0][1] - 1];
+
+							float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+							tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+							tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+							tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+							tangent = glm::normalize(tangent);
+
+							bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+							bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+							bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+							bitangent = glm::normalize(bitangent);
+						}
+
+						// END
+
 						std::vector<uint16_t> vertex = indici[i];
 						Vertex myVertex;
 
@@ -123,12 +150,12 @@ public:
 						myVertex.color = glm::vec3(0.0f, 0.0f, 0.0f);
 						myVertex.texcoord = vertexTexture[vertex[1] - 1];
 						myVertex.normal = vertexNormal[vertex[2] - 1];
+						myVertex.tangent = tangent;
+						myVertex.bitangen = bitangent;
 						vertices.push_back(myVertex);
 					
 						indices.push_back(indexDraw++); // Punem indicii dupa care sa deseneze
 					}
-
-
 				}
 			}
 			file.close();
@@ -144,9 +171,10 @@ class Triangle : public Primitive {
 public:
 	Triangle(): Primitive() {
 		Vertex vertices[] = {
-			glm::vec3(0.0f, 0.5f, 0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
-			glm::vec3(-0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f),
-			glm::vec3(0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 0.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f)
+			// Triangle with tan and bitan manualy calculated
+			glm::vec3(0.0f, 0.5f, 0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
+			glm::vec3(-0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
+			glm::vec3(0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 0.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f)
 		};
 
 		unsigned int noVertices = sizeof(vertices) / sizeof(Vertex);
@@ -159,4 +187,36 @@ public:
 
 		this->init(vertices, noVertices, indices, noIndices);
 	}
+
+	// Just for test to see how it's look tan and bitan
+	void tryTagBitag() {
+
+		glm::vec3 tangent1, bitangent1;
+
+		glm::vec3 edge1 = this->getVertices()[1].position - this->getVertices()[0].position;
+		glm::vec3 edge2 = this->getVertices()[2].position - this->getVertices()[0].position;
+
+		glm::vec2 deltaUV1 = this->getVertices()[1].texcoord - this->getVertices()[0].texcoord;
+		glm::vec2 deltaUV2 = this->getVertices()[2].texcoord - this->getVertices()[0].texcoord;
+
+		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+		tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+		tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+		tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+		tangent1 = glm::normalize(tangent1);
+
+		bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+		bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+		bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+		bitangent1 = glm::normalize(bitangent1);
+	}
+};
+
+
+class Pyramid : public Primitive {
+public:
+	Pyramid() : Primitive() {
+		this->loadDataFromObj("res\\shaders\\myPyramid.obj");
+	};
 };

@@ -6,4 +6,6 @@ struct Vertex {
 	glm::vec3 color;
 	glm::vec2 texcoord;
 	glm::vec3 normal;
+	glm::vec3 tangent;
+	glm::vec3 bitangen;
 };

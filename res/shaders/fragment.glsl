@@ -12,6 +12,7 @@ in vec3 vsPosition;
 in vec3 vsColor;
 in vec2 vsTexcoord;
 in vec3 vsNormal;
+in mat3 vsTBN;
 
 in mat4 vsModelMatrix;
 
@@ -55,13 +56,15 @@ void main() {
 	vec3 normalFromMap = texture(material.specularTex, vsTexcoord).rgb;
 	normalFromMap.g = 1 - normalFromMap.g;
 	normalFromMap = normalFromMap * 2 - 1;
+	// With this TBN matrix we can now update the normal mapping code to include the tangent-to-world space transformation:
+	normalFromMap = normalize(vsTBN * normalFromMap);
 
 	// Pentru a modifica normala in functie de transformarile geometrice pe care le aplic
 	normalFromMap = mat3(transpose(inverse(vsModelMatrix))) * normalFromMap;
 	
 
 	//	Without normal map
-//	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
+	//	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
 	
 	//	With normal map
 	vec3 color = lighting(vsPosition, normalFromMap, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
