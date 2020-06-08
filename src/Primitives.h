@@ -19,6 +19,8 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+enum ObjectOption {Pyramid = 0, Moon, Porsche};
+
 class Primitive {
 private:
 	std::vector<Vertex> vertices;
@@ -171,10 +173,10 @@ class Triangle : public Primitive {
 public:
 	Triangle(): Primitive() {
 		Vertex vertices[] = {
-			// Triangle with tan and bitan manualy calculated
-			glm::vec3(0.0f, 0.5f, 0.0f),		glm::vec3(1.0f, 0.0f, 0.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
-			glm::vec3(-0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 1.0f, 0.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
-			glm::vec3(0.5f, -0.5f, 0.0f),		glm::vec3(0.0f, 0.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f)
+			// Triangle with tan and bitan manually calculated
+			glm::vec3(0.0f, 0.5f, 0.0f),		glm::vec3(1.0f, 1.0f, 1.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
+			glm::vec3(-0.5f, -0.5f, 0.0f),		glm::vec3(1.0f, 1.0f, 1.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
+			glm::vec3(0.5f, -0.5f, 0.0f),		glm::vec3(1.0f, 1.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f)
 		};
 
 		unsigned int noVertices = sizeof(vertices) / sizeof(Vertex);
@@ -214,9 +216,23 @@ public:
 };
 
 
-class Pyramid : public Primitive {
+class ComplexObject : public Primitive {
 public:
-	Pyramid() : Primitive() {
-		this->loadDataFromObj("res\\shaders\\myPyramid.obj");
+	ComplexObject(int type) : Primitive() {
+		switch (type)
+		{
+			case Pyramid:
+				this->loadDataFromObj("res\\shaders\\pyramid\\myPyramid.obj");
+				break;
+			case Moon:
+				this->loadDataFromObj("res\\shaders\\moon\\moon.obj");
+				break;
+			case Porsche:
+				this->loadDataFromObj("res\\shaders\\porsche\\porsche.obj");
+				break;
+			default:
+				throw "Wrong obj";
+				break;
+		}
 	};
 };

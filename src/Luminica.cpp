@@ -106,9 +106,13 @@ entry_point{
 	Shader mainShader(vfile, ffile);
 
 	// Model mesh init
-	Pyramid triang = Pyramid();
-	Mesh mesh(&triang);
+	Primitive complexObj = ComplexObject(Pyramid);
+	Mesh mesh(&complexObj);
 
+	Primitive lightSource = ComplexObject(Moon);
+	Mesh lightMesh(&lightSource);
+	lightMesh.setPosition(glm::vec3(0.4, 0, 0));
+	lightMesh.setScale(glm::vec3(0.1, 0.1, 0));
 
 	// get version info
 	const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
@@ -116,8 +120,10 @@ entry_point{
 	printf("Renderer: %s\n", renderer);
 	printf("OpenGL version supported %s\n", version);
 
-	Texture wallTexture("res\\texture\\brickwall.jpg", GL_TEXTURE_2D, 0);
-	Texture wallTextureNormal("res\\texture\\brickwall_normal.jpg", GL_TEXTURE_2D, 1);
+	Texture wallTexture("res\\shaders\\porsche\\texture.jpg", GL_TEXTURE_2D, 0);
+	Texture wallTextureNormal("res\\shaders\\porsche\\normal.jpg", GL_TEXTURE_2D, 1);
+	//Texture wallTexture("res\\shaders\\pyramid\\brickwall.jpg", GL_TEXTURE_2D, 0);
+	//Texture wallTextureNormal("res\\shaders\\pyramid\\brickwall_normal.jpg", GL_TEXTURE_2D, 1);
 	Material materialWall(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), wallTexture.getUnit(), wallTextureNormal.getUnit());
 
 
@@ -165,6 +171,10 @@ entry_point{
 
 
 		mainShader.use();
+		
+		// Render light source
+		lightMesh.render(&mainShader);
+
 		materialWall.sendToShader(mainShader);
 
 
