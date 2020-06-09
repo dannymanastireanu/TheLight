@@ -25,9 +25,11 @@ http://glew.sourceforge.net/
 
 
 ## SS
-<a href="https://github.com/dannymanastireanu/TheLight"><img src="https://i.imgur.com/414vRa4.png" title="TL" alt="TL" width = 840px height=505px></a>
-<a href="https://github.com/dannymanastireanu/TheLight"><img src="https://i.imgur.com/vZoAdN2.png" title="TL" alt="TL" width = 1864px height=469px></a>
-<a href="https://github.com/dannymanastireanu/TheLight"><img src="https://i.imgur.com/CL67dBL.png" title="TL" alt="TL" width = 628px height=352px></a>
+<p align="center">
+<a href="https://github.com/dannymanastireanu/TheLight"><img src="https://i.imgur.com/goicFw5.png" title="TL" alt="TL" ></a>
+<a href="https://github.com/dannymanastireanu/TheLight"><img src="https://i.imgur.com/CL67dBL.png" title="TL" alt="TL" ></a>
+<a href="https://github.com/dannymanastireanu/TheLight"><img src="https://i.imgur.com/vZoAdN2.png" title="TL" alt="TL" ></a>
+</p>
 
 Demo link: https://drive.google.com/file/d/1ura_wTHEWtbqwTIrugt4T6ftybCwDUAX/view?usp=sharing
 
