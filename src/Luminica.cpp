@@ -13,22 +13,21 @@ const int WINDOW_HEIGHT = 720;
 int framebufferWidth, framebufferHeight;
 
 
-void updateInput(GLFWwindow* window, Mesh& mesh) {
-
+void updateInput(GLFWwindow* window, Mesh& mesh, Mesh& second, Mesh &sun) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		mesh.move(glm::vec3(0.0f, 0.0f, +0.02f));
 	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		mesh.move(glm::vec3(0.0f, 0.0f, -0.02f));
 	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		mesh.move(glm::vec3(0.02f, 0.0f, 0.0f));
 	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		mesh.move(glm::vec3(-0.02f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
@@ -41,14 +40,36 @@ void updateInput(GLFWwindow* window, Mesh& mesh) {
 		mesh.rotate(glm::vec3(-2.0f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-		mesh.rotate(glm::vec3(2.0f, 0.0f,0.0f));
+		mesh.rotate(glm::vec3(2.0f, 0.0f, 0.0f));
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
-
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
 
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		second.move(glm::vec3(0.0f, 0.0f, +0.01f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		second.move(glm::vec3(0.0f, 0.0f, -0.01f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		second.move(glm::vec3(0.01f, 0.0f, 0.0f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		second.move(glm::vec3(-0.01f, 0.0f, 0.0f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+		second.rotate(glm::vec3(0.0f, 2.0f, 0.0f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+		second.rotate(glm::vec3(0.0f, -2.0f, 0.0f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+		sun.rotate(glm::vec3(0.0f, 2.0f, 0.0f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+		sun.rotate(glm::vec3(0.0f, -2.0f, 0.0f));
 	}
 }
 
@@ -107,12 +128,19 @@ entry_point{
 
 	// Model mesh init
 	Primitive complexObj = ComplexObject(Pyramid);
-	Mesh mesh(&complexObj);
+	Mesh pyramidMesh(&complexObj);
+	pyramidMesh.scaleUp(glm::vec3(-0.9, -0.9, -0.9));
+	pyramidMesh.setPosition(glm::vec3(0.4f, -0.15f, 0.3f));
 
-	Primitive lightSource = ComplexObject(Moon);
+	Primitive lightSource = ComplexObject(Sun);
 	Mesh lightMesh(&lightSource);
-	lightMesh.setPosition(glm::vec3(0.4, 0, 0));
-	lightMesh.setScale(glm::vec3(0.1, 0.1, 0));
+	lightMesh.scaleUp(glm::vec3(-0.95, -0.95, -0.95));
+
+	// Porsche Mesh
+	Primitive porsche = ComplexObject(Porsche);
+	Mesh porscheMesh(&porsche);
+	porscheMesh.scaleUp(glm::vec3(-0.75, -0.75, -0.75));
+	//porscheMesh.setPosition(glm::vec3(-0.4f, 0.35f, 0.3f));
 
 	// get version info
 	const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
@@ -120,15 +148,24 @@ entry_point{
 	printf("Renderer: %s\n", renderer);
 	printf("OpenGL version supported %s\n", version);
 
-	Texture wallTexture("res\\shaders\\porsche\\texture.jpg", GL_TEXTURE_2D, 0);
-	Texture wallTextureNormal("res\\shaders\\porsche\\normal.jpg", GL_TEXTURE_2D, 1);
-	//Texture wallTexture("res\\shaders\\pyramid\\brickwall.jpg", GL_TEXTURE_2D, 0);
-	//Texture wallTextureNormal("res\\shaders\\pyramid\\brickwall_normal.jpg", GL_TEXTURE_2D, 1);
-	Material materialWall(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), wallTexture.getUnit(), wallTextureNormal.getUnit());
 
+
+	Texture sunTexture("res\\shaders\\sun\\texture.jpg", GL_TEXTURE_2D, 0);
+	Texture sunTextureNormal("res\\shaders\\sun\\normal.jpg", GL_TEXTURE_2D, 1);
+	Material materialSun(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), sunTexture.getUnit(), sunTextureNormal.getUnit());
+
+
+	Texture porscheTexture("res\\shaders\\porsche\\texture.jpg", GL_TEXTURE_2D, 2);
+	Texture porscheTextureNormal("res\\shaders\\porsche\\normal.jpg", GL_TEXTURE_2D, 3);
+	Material materialPorsche(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), porscheTexture.getUnit(), porscheTextureNormal.getUnit());
+
+	Texture wallTexture("res\\shaders\\pyramid\\brickwall.jpg", GL_TEXTURE_2D, 4);
+	Texture wallTextureNormal("res\\shaders\\pyramid\\brickwall_normal.jpg", GL_TEXTURE_2D, 5);
+	Material materialBrick(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), wallTexture.getUnit(), wallTextureNormal.getUnit());
 
 	//view position
-	glm::vec3 lightPosition(0.0f, 0.0f, 0.2f);
+	glm::vec3 lightPosition(-0.4f, 0.35f, 0.2f);
+	lightMesh.setPosition(lightPosition);
 	glm::vec3 viewPosition(glm::vec3(0, 0, 1));
 
 
@@ -163,7 +200,7 @@ entry_point{
 	while (!glfwWindowShouldClose(window)) {
 
 		glfwPollEvents();
-		updateInput(window, mesh);
+		updateInput(window, porscheMesh, pyramidMesh, lightMesh);
 
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -173,15 +210,29 @@ entry_point{
 		mainShader.use();
 		
 		// Render light source
+
+		materialSun.sendToShader(mainShader);
+
+
+		// draw lightsource
+		sunTexture.bind();
+		sunTextureNormal.bind();
 		lightMesh.render(&mainShader);
 
-		materialWall.sendToShader(mainShader);
 
-
+		// draw obj Pyramid + texture
+		materialBrick.sendToShader(mainShader);
 		wallTexture.bind();
 		wallTextureNormal.bind();
+		pyramidMesh.render(&mainShader);
 
-		mesh.render(&mainShader);
+
+		// draw obj Porsche + texture
+		materialPorsche.sendToShader(mainShader);
+		porscheTexture.bind();
+		porscheTextureNormal.bind();
+		porscheMesh.render(&mainShader);
+
 
 		glfwSwapBuffers(window);
 		glFlush();

@@ -19,7 +19,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-enum ObjectOption {Pyramid = 0, Moon, Porsche};
+enum ObjectOption {Pyramid = 0, Sun, Porsche};
 
 class Primitive {
 private:
@@ -224,8 +224,8 @@ public:
 			case Pyramid:
 				this->loadDataFromObj("res\\shaders\\pyramid\\myPyramid.obj");
 				break;
-			case Moon:
-				this->loadDataFromObj("res\\shaders\\moon\\moon.obj");
+			case Sun:
+				this->loadDataFromObj("res\\shaders\\sun\\sun.obj");
 				break;
 			case Porsche:
 				this->loadDataFromObj("res\\shaders\\porsche\\porsche.obj");
