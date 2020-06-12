@@ -164,7 +164,7 @@ entry_point{
 	Material materialBrick(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), wallTexture.getUnit(), wallTextureNormal.getUnit());
 
 	//view position
-	glm::vec3 lightPosition(-0.4f, 0.35f, 0.2f);
+	glm::vec3 lightPosition(-0.5f, 0.35f, 0.2f);
 	lightMesh.setPosition(lightPosition);
 	glm::vec3 viewPosition(glm::vec3(0, 0, 1));
 

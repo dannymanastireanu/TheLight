@@ -4,8 +4,8 @@ struct Material {
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
-	sampler2D diffuseTex;
-	sampler2D specularTex;
+	sampler2D textureImg;
+	sampler2D normalTextureImg;
 };
 
 in vec3 vsPosition;
@@ -23,6 +23,7 @@ uniform Material material;
 uniform sampler2D normalMap; 
 uniform vec3 lightPosition;
 uniform vec3 viewPosition;
+
 
 vec3 lighting(vec3 pos, vec3 normal, vec3 lightPos, vec3 viewPos,
 				vec3 ambient, vec3 lightColor, vec3 specular, float specPower)
@@ -51,23 +52,25 @@ void main() {
 	vec3 specular = material.specular;
 	float specPower = 32;
 	
-	vec3 colorFromTexture = texture2D(material.diffuseTex, vsTexcoord).rgb;
+	vec3 colorFromTexture = texture2D(material.textureImg, vsTexcoord).rgb;
 	
-	vec3 normalFromMap = texture(material.specularTex, vsTexcoord).rgb;
+	vec3 normalFromMap = texture(material.normalTextureImg, vsTexcoord).rgb;
 	normalFromMap.g = 1 - normalFromMap.g;
-	normalFromMap = normalFromMap * 2 - 1;
+	normalFromMap = normalize(normalFromMap * 2 - 1);
+
 	// With this TBN matrix we can now update the normal mapping code to include the tangent-to-world space transformation:
 	normalFromMap = normalize(vsTBN * normalFromMap);
 
 	// Pentru a modifica normala in functie de transformarile geometrice pe care le aplic
-	normalFromMap = mat3(transpose(inverse(vsModelMatrix))) * normalFromMap;
+	// some bad with this line
+	//	normalFromMap = mat3(transpose(inverse(vsModelMatrix))) * normalFromMap;
 	
 
 	//	Without normal map
-//		vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
+	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
 	
 	//	With normal map
-	vec3 color = lighting(vsPosition, normalFromMap, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
+//	vec3 color = lighting(vsPosition, normalFromMap, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
 	
 	FragColor = vec4(color, 1.0);
 }

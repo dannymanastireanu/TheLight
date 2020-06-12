@@ -45,5 +45,5 @@ void main() {
 	
 	//END Some try of tag and bitag
 	
-	gl_Position = (projectionMatrix * modelMatrix) * vec4(position, 1.0f);
+	gl_Position = (projectionMatrix * viewMatrix * modelMatrix) * vec4(position, 1.0f);
 }
