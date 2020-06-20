@@ -63,14 +63,14 @@ void main() {
 
 	// Pentru a modifica normala in functie de transformarile geometrice pe care le aplic
 	// some bad with this line
-	//	normalFromMap = mat3(transpose(inverse(vsModelMatrix))) * normalFromMap;
+//		normalFromMap = mat3(transpose(inverse(vsModelMatrix))) * normalFromMap;
 	
 
 	//	Without normal map
-	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
+//	vec3 color = lighting(vsPosition, vsNormal, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
 	
 	//	With normal map
-//	vec3 color = lighting(vsPosition, normalFromMap, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
+	vec3 color = lighting(vsPosition, normalFromMap, lightPosition, viewPosition, ambient, diffuse, specular, specPower) * colorFromTexture;
 	
 	FragColor = vec4(color, 1.0);
 }

@@ -19,7 +19,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-enum ObjectOption {Pyramid = 0, Sun, Porsche};
+enum ObjectOption {Pyramid = 0, Sun, Porsche, Table};
 
 class Primitive {
 private:
@@ -215,6 +215,28 @@ public:
 	}
 };
 
+class Background : public Primitive {
+public:
+	Background() : Primitive() {
+		Vertex vertices[] = {
+			glm::vec3(-1.0f, 1.0f, 0.0f),		glm::vec3(1.0f, 1.0f, 1.0f),	glm::vec2(0.0f, 1.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
+			glm::vec3(1.0f, 1.0f, 0.0f),		glm::vec3(1.0f, 1.0f, 1.0f),	glm::vec2(0.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
+			glm::vec3(1.0f, -1.0f, 0.0f),		glm::vec3(1.0f, 1.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f),
+			glm::vec3(-1.0f, -1.0f, 0.0f),		glm::vec3(1.0f, 1.0f, 1.0f),	glm::vec2(1.0f, 0.0f),	glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.447213f, 0.89442f, 0.0f)
+		};
+
+		unsigned int noVertices = sizeof(vertices) / sizeof(Vertex);
+
+		GLuint indices[] = {
+			0, 1, 2, 0, 2, 3
+		};
+
+		unsigned int noIndices = sizeof(indices) / sizeof(GLuint);
+
+		this->init(vertices, noVertices, indices, noIndices);
+	}
+};
+
 
 class ComplexObject : public Primitive {
 public:
@@ -229,6 +251,9 @@ public:
 				break;
 			case Porsche:
 				this->loadDataFromObj("res\\shaders\\porsche\\porsche.obj");
+				break;
+			case Table:
+				this->loadDataFromObj("res\\shaders\\table\\table.obj");
 				break;
 			default:
 				throw "Wrong obj";

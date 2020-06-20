@@ -48,10 +48,10 @@ void updateInput(GLFWwindow* window, Mesh& mesh, Mesh& second, Mesh &sun) {
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		second.move(glm::vec3(0.0f, 0.0f, +0.01f));
+		second.move(glm::vec3(0.0f, +0.005f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		second.move(glm::vec3(0.0f, 0.0f, -0.01f));
+		second.move(glm::vec3(0.0f, -0.005f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		second.move(glm::vec3(0.01f, 0.0f, 0.0f));
@@ -130,7 +130,7 @@ entry_point{
 	Primitive complexObj = ComplexObject(Pyramid);
 	Mesh pyramidMesh(&complexObj);
 	pyramidMesh.scaleUp(glm::vec3(-0.9, -0.9, -0.9));
-	pyramidMesh.setPosition(glm::vec3(0.4f, -0.15f, 0.3f));
+	pyramidMesh.setPosition(glm::vec3(0.5f, -0.05f, 0.0f));
 
 	Primitive lightSource = ComplexObject(Sun);
 	Mesh lightMesh(&lightSource);
@@ -141,6 +141,14 @@ entry_point{
 	Mesh porscheMesh(&porsche);
 	porscheMesh.scaleUp(glm::vec3(-0.75, -0.75, -0.75));
 	//porscheMesh.setPosition(glm::vec3(-0.4f, 0.35f, 0.3f));
+
+
+	//Background Mesh
+	Primitive table = ComplexObject(Table);
+	Mesh tableMesh(&table);
+	tableMesh.scaleUp(glm::vec3(-0.99, -0.99, -0.99));
+	tableMesh.rotate(glm::vec3(0.0f, 90.00f, 0.0f));
+	tableMesh.move(glm::vec3(0.52f, -0.39f, 0.0f));
 
 	// get version info
 	const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
@@ -162,6 +170,10 @@ entry_point{
 	Texture wallTexture("res\\shaders\\pyramid\\brickwall.jpg", GL_TEXTURE_2D, 4);
 	Texture wallTextureNormal("res\\shaders\\pyramid\\brickwall_normal.jpg", GL_TEXTURE_2D, 5);
 	Material materialBrick(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), wallTexture.getUnit(), wallTextureNormal.getUnit());
+
+	Texture tableTexture("res\\shaders\\table\\texture.jpg", GL_TEXTURE_2D, 6);
+	Texture tableTextureNormal("res\\shaders\\table\\table_normal.jpg", GL_TEXTURE_2D, 7);
+	Material materialTable(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), tableTexture.getUnit(), tableTextureNormal.getUnit());
 
 	//view position
 	glm::vec3 lightPosition(-0.5f, 0.35f, 0.2f);
@@ -201,6 +213,9 @@ entry_point{
 
 		glfwPollEvents();
 		updateInput(window, porscheMesh, pyramidMesh, lightMesh);
+		// make the objects to be dynamic
+		lightMesh.rotate(glm::vec3(0.0f, 1.0f, 0.0f));
+		pyramidMesh.rotate(glm::vec3(0.0f, -1.0f, 0.0f));
 
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -232,6 +247,13 @@ entry_point{
 		porscheTexture.bind();
 		porscheTextureNormal.bind();
 		porscheMesh.render(&mainShader);
+
+
+		// draw obj background + texture
+		materialTable.sendToShader(mainShader);
+		tableTexture.bind();
+		tableTextureNormal.bind();
+		tableMesh.render(&mainShader);
 
 
 		glfwSwapBuffers(window);
