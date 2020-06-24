@@ -5,29 +5,49 @@
 #include "Mesh.h"
 #include "EntryPoint.hpp"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 const char* vfile = "res\\shaders\\vertex.glsl";
 const char* ffile = "res\\shaders\\fragment.glsl";
+const char* svfile = "res\\shaders\\shadow_mapping_depth_vert.glsl";
+const char* sffile = "res\\shaders\\shadow_mapping_depth_frag.glsl";
 
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 int framebufferWidth, framebufferHeight;
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+void processInput(GLFWwindow *window)
+{
+	const float cameraSpeed = 0.005f;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
 
 void updateInput(GLFWwindow* window, Mesh& mesh, Mesh& second, Mesh &sun) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
 		mesh.move(glm::vec3(0.0f, 0.0f, +0.02f));
 	}
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
 		mesh.move(glm::vec3(0.0f, 0.0f, -0.02f));
 	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
 		mesh.move(glm::vec3(0.02f, 0.0f, 0.0f));
 	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
 		mesh.move(glm::vec3(-0.02f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
@@ -111,19 +131,14 @@ entry_point{
 		return -1;
 	}
 
-	//Some stuff who doens't work momentary
 	glEnable(GL_DEPTH_TEST);
-	/*glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);*/
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// IDK
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Shader init
+
+	Shader simpleDepthShader(svfile, sffile);
 	Shader mainShader(vfile, ffile);
 
 	// Model mesh init
@@ -172,7 +187,7 @@ entry_point{
 	Material materialBrick(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), wallTexture.getUnit(), wallTextureNormal.getUnit());
 
 	Texture tableTexture("res\\shaders\\table\\texture.jpg", GL_TEXTURE_2D, 6);
-	Texture tableTextureNormal("res\\shaders\\table\\table_normal.jpg", GL_TEXTURE_2D, 7);
+	Texture tableTextureNormal("res\\shaders\\table\\normal.jpg", GL_TEXTURE_2D, 7);
 	Material materialTable(glm::vec3(0.1f), glm::vec3(0.75f), glm::vec3(1.0f), tableTexture.getUnit(), tableTextureNormal.getUnit());
 
 	//view position
@@ -209,27 +224,52 @@ entry_point{
 
 	mainShader.disable();
 
+	// begin Shadow-Mapping
+	 // configure depth map FBO
+	// -----------------------
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// end
+
+
 	while (!glfwWindowShouldClose(window)) {
 
 		glfwPollEvents();
 		updateInput(window, porscheMesh, pyramidMesh, lightMesh);
+		processInput(window);
 		// make the objects to be dynamic
-		lightMesh.rotate(glm::vec3(0.0f, 1.0f, 0.0f));
+		lightMesh.rotate(glm::vec3(0.0f, 0.5f, 0.0f));
 		pyramidMesh.rotate(glm::vec3(0.0f, -1.0f, 0.0f));
+
 
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
 		mainShader.use();
-		
-		// Render light source
-
-		materialSun.sendToShader(mainShader);
-
+		// Move the camera dynamic
+		/*glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		mainShader.setMat4fv(view, "viewMatrix");*/
 
 		// draw lightsource
+		materialSun.sendToShader(mainShader);
 		sunTexture.bind();
 		sunTextureNormal.bind();
 		lightMesh.render(&mainShader);

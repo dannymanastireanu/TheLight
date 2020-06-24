@@ -14,4 +14,8 @@
     <ClCompile Include="src\Luminica.cpp" />
     <ClCompile Include="ClassRoom.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\shadow_mapping_depth_vert.glsl" />
+    <None Include="res\shaders\shadow_mapping_depth_frag.glsl" />
+  </ItemGroup>
 </Project>

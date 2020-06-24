@@ -32,6 +32,10 @@
     <ClCompile Include="ClassRoom.cpp" />
     <ClCompile Include="src\Luminica.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\shadow_mapping_depth_frag.glsl" />
+    <None Include="res\shaders\shadow_mapping_depth_vert.glsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{5FD93A7F-7609-4FD9-BACB-F7E20509CFEA}</ProjectGuid>

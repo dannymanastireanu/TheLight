@@ -16,8 +16,10 @@ out mat3 vsTBN;
 
 uniform mat4 MVP;
 uniform mat4 modelMatrix, viewMatrix, projectionMatrix;
+uniform mat4 lightSpaceMatrix;
 
 out mat4 vsModelMatrix;
+out vec4 FragPosLightSpace;
 
 void main() {
 
@@ -30,7 +32,7 @@ void main() {
 	
 	vsModelMatrix = modelMatrix;
 
-	//BEGIN Some try of tag and bitag
+	//BEGIN tag and bitag calculation
 
 	vec3 T = normalize(vec3(modelMatrix * vec4(aTangent,   0.0)));
 //	vec3 B = normalize(vec3(modelMatrix * vec4(aBitangent, 0.0)));
@@ -43,7 +45,10 @@ void main() {
 	vsTBN = TBN;
 
 	
-	//END Some try of tag and bitag
+	//END tag and bitag calculation
+
+	// Shadow-mapping
+	FragPosLightSpace = lightSpaceMatrix * vec4(vsPosition, 1.0);
 	
 	gl_Position = (projectionMatrix * viewMatrix * modelMatrix) * vec4(position, 1.0f);
 }

@@ -13,6 +13,7 @@ in vec3 vsColor;
 in vec2 vsTexcoord;
 in vec3 vsNormal;
 in mat3 vsTBN;
+in vec4 FragPosLightSpace;
 
 in mat4 vsModelMatrix;
 
@@ -24,6 +25,25 @@ uniform sampler2D normalMap;
 uniform vec3 lightPosition;
 uniform vec3 viewPosition;
 
+// Shadow-mapping
+uniform sampler2D shadowMap;
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+
+	// Until I will resolve the bug to do not affect entire project: return 0
+	return 0.0;
+    return shadow;
+}
 
 vec3 lighting(vec3 pos, vec3 normal, vec3 lightPos, vec3 viewPos,
 				vec3 ambient, vec3 lightColor, vec3 specular, float specPower)
@@ -40,7 +60,10 @@ vec3 lighting(vec3 pos, vec3 normal, vec3 lightPos, vec3 viewPos,
 	vec3 ambientColor = ambient * lightColor;
 	vec3 diffuseColor = diffCoef * lightColor;
 	vec3 specularColor = specCoef * specular * lightColor;
-	vec3 col = ( ambientColor + diffuseColor + specularColor ); 
+
+	float shadow = ShadowCalculation(FragPosLightSpace);
+
+	vec3 col = ( ambientColor + (1.0 - shadow) * ( diffuseColor + specularColor )); 
 	
 	return clamp(col, 0, 1);
 }
