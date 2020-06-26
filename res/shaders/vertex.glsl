@@ -27,8 +27,8 @@ void main() {
 	vsColor = color;
 	vsTexcoord = vec2(texcoord.x, texcoord.y);
 
-	// De ce transpuse and inverse?
-	vsNormal = mat3(transpose(inverse(modelMatrix))) * normal;
+//	vsNormal = mat3(transpose(inverse(modelMatrix)) * normal;
+	vsNormal = mat3(modelMatrix) * normal;
 	
 	vsModelMatrix = modelMatrix;
 
@@ -39,7 +39,6 @@ void main() {
 	vec3 N = normalize(vec3(modelMatrix * vec4(normal,    0.0)));
 	// re-orthogonalize T with respect to N
 	T = normalize(T - dot(T, N) * N);
-	// then retrieve perpendicular vector B with the cross product of T and N
 	vec3 B = cross(N, T);
 	mat3 TBN = mat3(T, B, N);
 	vsTBN = TBN;

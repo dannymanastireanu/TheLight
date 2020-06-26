@@ -8,11 +8,9 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Primitives.h" />
-    <ClInclude Include="ClassRoom.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Luminica.cpp" />
-    <ClCompile Include="ClassRoom.cpp" />
+    <ClCompile Include="src\TheLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\shadow_mapping_depth_vert.glsl" />

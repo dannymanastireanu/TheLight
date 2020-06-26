@@ -15,9 +15,8 @@ const char* sffile = "res\\shaders\\shadow_mapping_depth_frag.glsl";
 
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
-int framebufferWidth, framebufferHeight;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 void processInput(GLFWwindow *window)
@@ -98,15 +97,14 @@ void error_callback(int error, const char* description) {
 }
 
 
-GLFWwindow* createWindow(const char* winName, const int width, const int height, int& frameBufferWidht, int& frameBufferHeight, const int glMin, const int glMaj) {
+GLFWwindow* createWindow(const char* winName, const int width, const int height, const int glMin, const int glMaj) {
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glMaj);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMin);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, winName, NULL, NULL);
-	glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
-	glViewport(0, 0, framebufferWidth, framebufferHeight);
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	glfwMakeContextCurrent(window);
 
@@ -122,7 +120,7 @@ entry_point{
 		return -1;
 	}
 
-	GLFWwindow* window = createWindow("TheLight", WINDOW_WIDTH, WINDOW_HEIGHT, framebufferWidth, framebufferHeight, 4, 4);
+	GLFWwindow* window = createWindow("TheLight", WINDOW_WIDTH, WINDOW_HEIGHT, 4, 4);
 
 	GLint err;
 	if ((err = glewInit()) != GLEW_OK) {
@@ -134,7 +132,7 @@ entry_point{
 	glEnable(GL_DEPTH_TEST);
 
 	// IDK
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Shader init
 
@@ -155,7 +153,6 @@ entry_point{
 	Primitive porsche = ComplexObject(Porsche);
 	Mesh porscheMesh(&porsche);
 	porscheMesh.scaleUp(glm::vec3(-0.75, -0.75, -0.75));
-	//porscheMesh.setPosition(glm::vec3(-0.4f, 0.35f, 0.3f));
 
 
 	//Background Mesh
@@ -166,8 +163,8 @@ entry_point{
 	tableMesh.move(glm::vec3(0.52f, -0.39f, 0.0f));
 
 	// get version info
-	const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
-	const GLubyte* version = glGetString(GL_VERSION); // version as a string
+	const GLubyte* renderer = glGetString(GL_RENDERER); 
+	const GLubyte* version = glGetString(GL_VERSION); 
 	printf("Renderer: %s\n", renderer);
 	printf("OpenGL version supported %s\n", version);
 
@@ -224,30 +221,6 @@ entry_point{
 
 	mainShader.disable();
 
-	// begin Shadow-Mapping
-	 // configure depth map FBO
-	// -----------------------
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-	unsigned int depthMapFBO;
-	glGenFramebuffers(1, &depthMapFBO);
-	// create depth texture
-	unsigned int depthMap;
-	glGenTextures(1, &depthMap);
-	glBindTexture(GL_TEXTURE_2D, depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// attach depth texture as FBO's depth buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// end
-
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -265,15 +238,14 @@ entry_point{
 
 		mainShader.use();
 		// Move the camera dynamic
-		/*glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-		mainShader.setMat4fv(view, "viewMatrix");*/
+		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		mainShader.setMat4fv(view, "viewMatrix");
 
 		// draw lightsource
 		materialSun.sendToShader(mainShader);
 		sunTexture.bind();
 		sunTextureNormal.bind();
 		lightMesh.render(&mainShader);
-
 
 		// draw obj Pyramid + texture
 		materialBrick.sendToShader(mainShader);

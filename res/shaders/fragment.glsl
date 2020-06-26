@@ -84,9 +84,6 @@ void main() {
 	// With this TBN matrix we can now update the normal mapping code to include the tangent-to-world space transformation:
 	normalFromMap = normalize(vsTBN * normalFromMap);
 
-	// Pentru a modifica normala in functie de transformarile geometrice pe care le aplic
-	// some bad with this line
-//		normalFromMap = mat3(transpose(inverse(vsModelMatrix))) * normalFromMap;
 	
 
 	//	Without normal map

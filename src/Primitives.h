@@ -121,8 +121,6 @@ public:
 						
 						// BEGIN Compute tan && bitan
 
-						
-						// Compute single time for a triangle(same for each vertex)
 						if (i == 0) {
 							glm::vec3 edge1 = vertexPosition[indici[1][0] - 1] - vertexPosition[indici[0][0] - 1];
 							glm::vec3 edge2 = vertexPosition[indici[2][0] - 1] - vertexPosition[indici[1][0] - 1];
