@@ -31,7 +31,7 @@ http://glew.sourceforge.net/
 <a href="https://github.com/dannymanastireanu/TheLight"><img src="https://i.imgur.com/vZoAdN2.png" title="TL" alt="TL" ></a>
 </p>
 
-Demo link: https://drive.google.com/file/d/1ura_wTHEWtbqwTIrugt4T6ftybCwDUAX/view?usp=sharing
+Demo link: https://youtu.be/GsfNeNloy7k
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
